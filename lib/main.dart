@@ -1,10 +1,17 @@
+import 'package:bloc_101/features/users/domain/entities/user.dart';
+import 'package:bloc_101/features/users/presentation/bloc/users_bloc.dart';
+import 'package:bloc_101/simple_bloc_observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'di/injection.dart';
 
 void main() {
   configureInjection();
-  runApp(const MyApp());
+  BlocOverrides.runZoned(
+    () => runApp(const MyApp()),
+    blocObserver: SimpleBlocObserver(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +25,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: BlocProvider(
+        create: (context) => getIt<UsersBloc>()..add(GetUsersEvent()),
+        child: MyHomePage(title: 'Flutter Demo Home Page'),
+      ),
     );
   }
 }
@@ -33,55 +43,53 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+      body: BlocBuilder<UsersBloc, UsersState>(
+        builder: (context, state) {
+          if (state is UsersLoaded) {
+            return ListView.separated(
+              itemCount: state.users.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider();
+              },
+              itemBuilder: (BuildContext context, int index) {
+                UserEntity user = state.users[index];
+                return ListTile(
+                  title: Text(user.firstName!),
+                  subtitle: Text(user.lastName!),
+                );
+              },
+            );
+          }
+
+          if (state is UsersErrored) {
+            return Center(
+              child: Text(state.error),
+            );
+          }
+
+          if (state is UsersRefreshing) {
+            return const Center(
+              child: LinearProgressIndicator(),
+            );
+          }
+
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        onPressed: () {
+          context.read<UsersBloc>().add(UsersRefreshEvent());
+        },
+        child: Icon(Icons.refresh),
+      ),
     );
   }
 }

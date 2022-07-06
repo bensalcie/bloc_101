@@ -3,6 +3,7 @@ import 'package:bloc_101/errors/failure.dart';
 import 'package:bloc_101/features/users/data/models/user.dart';
 import 'package:bloc_101/network/dio_config.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class UserRemoteDataSource {
@@ -29,7 +30,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
       return results['data']
           .map<UserModel>((json) => UserModel.fromJson(json))
-          .asList();
+          .toList();
     } catch (e) {
       rethrow;
     }

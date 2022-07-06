@@ -15,9 +15,11 @@ import '../features/users/data/repositories/user/user_repository_impl.dart'
     as _i9;
 import '../features/users/domain/repositories/user_repository.dart' as _i8;
 import '../features/users/domain/usecases/get_user_usecase.dart' as _i10;
+import '../features/users/domain/usecases/get_users_usecase.dart' as _i11;
+import '../features/users/presentation/bloc/users_bloc.dart' as _i12;
 import '../network/dio_config.dart' as _i6;
 import '../network/network_info.dart' as _i5;
-import 'module_injection.dart' as _i11; // ignore_for_file: unnecessary_lambdas
+import 'module_injection.dart' as _i13; // ignore_for_file: unnecessary_lambdas
 
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
@@ -38,7 +40,10 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
       () => _i9.UserRepositoryImpl(get<_i7.UserRemoteDataSource>()));
   gh.lazySingleton<_i10.GetUserUseCase>(
       () => _i10.GetUserUseCase(get<_i8.UserRepository>()));
+  gh.lazySingleton<_i11.GetUsersUseCase>(
+      () => _i11.GetUsersUseCase(get<_i8.UserRepository>()));
+  gh.factory<_i12.UsersBloc>(() => _i12.UsersBloc(get<_i11.GetUsersUseCase>()));
   return get;
 }
 
-class _$RegisterModules extends _i11.RegisterModules {}
+class _$RegisterModules extends _i13.RegisterModules {}
