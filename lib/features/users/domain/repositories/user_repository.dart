@@ -5,5 +5,5 @@ import 'package:dartz/dartz.dart';
 abstract class UserRepository {
   Future<Either<Failure, List<UserEntity>>> getUsers();
 
-  Future<Either<Failure, UserEntity>> getUser({required int id});
+  Future<Either<Failure, UserEntity>> getUser(int id);
 }

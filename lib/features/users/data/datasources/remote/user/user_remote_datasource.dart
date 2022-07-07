@@ -1,15 +1,12 @@
-import 'package:bloc_101/errors/exceptions.dart';
-import 'package:bloc_101/errors/failure.dart';
 import 'package:bloc_101/features/users/data/models/user.dart';
 import 'package:bloc_101/network/dio_config.dart';
-import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
+import 'package:bloc_101/usecase/usecase.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class UserRemoteDataSource {
   Future<List<UserModel>> getUsers();
 
-  Future<UserModel> getUser();
+  Future<UserModel> getUser({required int id});
 }
 
 @LazySingleton(as: UserRemoteDataSource)
@@ -19,14 +16,22 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   const UserRemoteDataSourceImpl(this._dioClient);
 
   @override
-  Future<UserModel> getUser() {
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<UserModel>> getUsers() async {
     try {
       final results = await _dioClient.get('users');
+
+      return results['data']
+          .map<UserModel>((json) => UserModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<UserModel> getUser({required int id}) async {
+    try {
+      final results = await _dioClient.get('users/$id');
 
       return results['data']
           .map<UserModel>((json) => UserModel.fromJson(json))

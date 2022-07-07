@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'di/injection.dart';
+import 'features/users/presentation/pages/bottom_sheet_page.dart';
 
 void main() {
   configureInjection();
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider(
         create: (context) => getIt<UsersBloc>()..add(GetUsersEvent()),
-        child: MyHomePage(title: 'Flutter Demo Home Page'),
+        child: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
   }
@@ -59,9 +60,24 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               itemBuilder: (BuildContext context, int index) {
                 UserEntity user = state.users[index];
-                return ListTile(
-                  title: Text(user.firstName!),
-                  subtitle: Text(user.lastName!),
+                return InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => BottomSheetPage(
+                          id: user.id!,
+                        ),
+                      ),
+                    );
+                    // showBottomSheet(
+                    //     context: context,
+                    //     builder: (context) => BottomSheetPage(id: user.id!));
+                  },
+                  child: ListTile(
+                    title: Text(user.firstName!),
+                    subtitle: Text(user.lastName!),
+                  ),
                 );
               },
             );

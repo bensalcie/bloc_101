@@ -13,6 +13,6 @@ class GetUserUseCase implements UseCase<UserEntity, IdParams> {
 
   @override
   Future<Either<Failure, UserEntity?>> call(IdParams params) async {
-    return await _userRepository.getUser(id: params.id);
+    return await _userRepository.getUser(params.id);
   }
 }
