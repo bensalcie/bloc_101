@@ -3,6 +3,7 @@ import 'package:bloc_101/features/users/data/datasources/remote/user/user_remote
 import 'package:bloc_101/features/users/domain/entities/user.dart';
 import 'package:bloc_101/errors/failure.dart';
 import 'package:bloc_101/features/users/domain/repositories/user_repository.dart';
+import 'package:bloc_101/usecase/usecase.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
@@ -15,7 +16,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, UserEntity>> getUser(int id) async {
     try {
-      final user = await _userRemoteDataSource.getUser(id: id);
+      final user = await _userRemoteDataSource.getUser(IdParams(id: id));
       return Right(user);
     } on ServerException {
       return Left(ServerFailure());

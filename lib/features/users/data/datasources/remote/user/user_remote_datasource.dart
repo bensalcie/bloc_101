@@ -6,7 +6,7 @@ import 'package:injectable/injectable.dart';
 abstract class UserRemoteDataSource {
   Future<List<UserModel>> getUsers();
 
-  Future<UserModel> getUser({required int id});
+  Future<UserModel> getUser(IdParams params);
 }
 
 @LazySingleton(as: UserRemoteDataSource)
@@ -29,9 +29,9 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   }
 
   @override
-  Future<UserModel> getUser({required int id}) async {
+  Future<UserModel> getUser(IdParams params) async {
     try {
-      final results = await _dioClient.get('users/$id');
+      final results = await _dioClient.get('users/${params.id}');
 
       return results['data']
           .map<UserModel>((json) => UserModel.fromJson(json))
